@@ -64,7 +64,7 @@
         "ttl":{
             "type": "int",
             "defaultValue": 1,
-            "minValue": 120,
+            "minValue": 1,
             "maxValue": 2147483647
 
         }
