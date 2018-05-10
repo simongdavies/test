@@ -1,0 +1,77 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "Specifies the location of the public IP."
+            }
+        },
+        "publicDnsName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specifies a unique public DNS prefix for the deployment. This will produce a FQDN of the form '<publicDnsName>.<location>.cloudapp.azure.com'. Up to 62 chars, digits or dashes, lowercase, should start with a letter: must conform to '^[a-z][a-z0-9-]{1,61}[a-z0-9]$'."
+            }
+        },
+        "publicIpName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specifies the resource name for the public IP. New IPs will take this name, while references to existing ones should be valid."
+            }
+        },
+        "resourcegroupName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specifies the Resource Group Name to run the deployment in"
+            }
+        },
+        "_artifactsLocation": {
+            "type": "string",
+            "metadata": {
+                "description": "The base URI where artifacts required by this template are located including a trailing '/'"
+            },
+            "defaultValue": "[deployment().properties.templateLink.uri]"
+        }
+    },
+    "variables": {
+        "apiversion": "2017-10-01",
+        "createPublicIPAddressTemplateLink": "[concat(parameters('_artifactsLocation'),'/createPublicIPAddress.json')]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2017-05-10",
+            "name": "nestedTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('resourcegroupName')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink" :{
+                    "uri": "[variables('createPublicIPAddressTemplateLink')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters":{
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "publicDnsName": {
+                        "value": "[parameters('publicDnsName')]"
+                    },
+                    "publicIpName": {
+                        "value":"[parameters('publicIpName')]"
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "PublicIPAddress" :{
+            "type": "string",
+            "value": "[reference('nestedTemplate').outputs.PublicIPAddress.value]"
+        },
+        "FQDN" :{
+            "type": "string",
+            "value": "[reference('nestedTemplate').outputs.FQDN.value]"
+        }
+    }
+}
