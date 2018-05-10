@@ -113,7 +113,7 @@
         "ipName":"[concat(parameters('clusterName'),'-',uniquestring(resourceGroup().id,deployment().Name))]",
         "ipAddressTemplateLink": "[uri(parameters('_artifactsLocation'), 'nestedTemplates/publicIPAddress.json')]",
         "resourceGroupTemplateLink": "[uri(parameters('_artifactsLocation'), 'nestedTemplates/resourceGroupName.json')]",
-        "nodePoolName":"nodePool1"
+        "nodePoolName":"nodepool1"
     },
     "resources": [
         {
