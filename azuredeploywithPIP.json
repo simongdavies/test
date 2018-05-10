@@ -210,7 +210,7 @@
         },
         {
             "type": "Microsoft.TerraformOSS/resources",
-            "name": "NginxPod",
+            "name": "NginxPod1",
             "apiVersion": "2018-05-01-preview",
             "location": "[parameters('TFRPlocation')]",
             "properties": {
@@ -219,9 +219,9 @@
                 "settings": {
                     "metadata": [
                         {
-                            "name": "nginx",
+                            "name": "nginx1",
                             "labels": {
-                                "App": "nginx"
+                                "App": "nginx1"
                             }
                         }
                     ],
@@ -259,11 +259,11 @@
                     "spec": [
                         {
                             "selector":{
-                                "App":"nginx"
+                                "App":"nginx1"
                             },
                             "port": [ 
                                 {
-                                    "name":"nginx-port-80",
+                                    "name":"nginx1-port-80",
                                     "protocol": "TCP",
                                     "port": 80,
                                     "target_port": 8080
