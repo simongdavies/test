@@ -253,7 +253,7 @@
                 "settings": {
                     "metadata": [
                         {
-                            "name": "Service"
+                            "name": "[concat('service-',uniquestring(deployment().Name))]"
                         }
                     ],
                     "spec": [
