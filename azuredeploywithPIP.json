@@ -111,8 +111,8 @@
         },
         "aksRG":"[concat('MC_',resourceGroup().name,'_',parameters('clusterName'),'_',replace(parameters('location'),' ', ''))]",
         "ipName":"[concat(parameters('clusterName'),'-',uniquestring(deployment().Name))]",
-        "ipAddressTemplateLink": "[uri(parameters('_artifactsLocation'), concat('nestedTemplates/publicIPAddress.json'))]",
-        "resourceGroupTemplateLink": "[uri(parameters('_artifactsLocation'), concat('nestedTemplates/resourceGroupName.json'))]"
+        "ipAddressTemplateLink": "[uri(parameters('_artifactsLocation'), 'nestedTemplates/publicIPAddress.json')]",
+        "resourceGroupTemplateLink": "[uri(parameters('_artifactsLocation'), 'nestedTemplates/resourceGroupName.json')]"
     },
     "resources": [
         {

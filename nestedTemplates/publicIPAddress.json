@@ -36,7 +36,7 @@
     },
     "variables": {
         "apiversion": "2017-10-01",
-        "createPublicIPAddressTemplateLink": "[concat(parameters('_artifactsLocation'),'/createPublicIPAddress.json')]"
+        "createPublicIPAddressTemplateLink": "[uri(parameters('_artifactsLocation'),'/createPublicIPAddress.json')]"
     },
     "resources": [
         {
