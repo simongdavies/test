@@ -110,9 +110,10 @@
             "version": "[parameters('secretVersion')]"    
         },
         "aksRG":"[concat('MC_',resourceGroup().name,'_',parameters('clusterName'),'_',replace(parameters('location'),' ', ''))]",
-        "ipName":"[concat(parameters('clusterName'),'-',uniquestring(deployment().Name))]",
+        "ipName":"[concat(parameters('clusterName'),'-',uniquestring(resourceGroup().id,deployment().Name))]",
         "ipAddressTemplateLink": "[uri(parameters('_artifactsLocation'), 'nestedTemplates/publicIPAddress.json')]",
-        "resourceGroupTemplateLink": "[uri(parameters('_artifactsLocation'), 'nestedTemplates/resourceGroupName.json')]"
+        "resourceGroupTemplateLink": "[uri(parameters('_artifactsLocation'), 'nestedTemplates/resourceGroupName.json')]",
+        "nodePoolName":"nodePool1"
     },
     "resources": [
         {
@@ -121,14 +122,14 @@
             "apiVersion": "2017-08-31",
             "location": "[parameters('location')]",
             "properties": {
-                "dnsPrefix": "[concat(parameters('clusterName'),uniquestring(deployment().Name))]",
+                "dnsPrefix": "[concat(parameters('clusterName'),uniquestring(resourceGroup().id,deployment().Name))]",
                 "kubernetesVersion": "[parameters('kubernetesVersion')]",
                 "agentPoolProfiles": [
                     {
-                        "name": "nodepool1",
+                        "name": "[variables('nodePoolName')]",
                         "count": "[parameters('nodeCount')]",
                         "vmSize": "[parameters('nodeVMSize')]",
-                        "dnsPrefix": "[concat(parameters('clusterName'),uniquestring(deployment().Name))]",
+                        "dnsPrefix": "[concat(parameters('clusterName'),uniquestring(variables('nodePoolName'),resourceGroup().id,deployment().Name))]",
                         "storageProfile": "[parameters('storageProfile')]",
                         "osType": "Linux"
                     }
@@ -185,7 +186,7 @@
                         "value": "[parameters('location')]"
                     },
                     "publicDnsName": {
-                        "value": "[concat('aks',uniquestring(deployment().Name))]"
+                        "value": "[concat('aks',uniquestring(resourceGroup().id,deployment().Name))]"
                     },
                     "publicIpName": {
                         "value": "[variables('ipName')]"
@@ -253,7 +254,7 @@
                 "settings": {
                     "metadata": [
                         {
-                            "name": "[concat('service-',uniquestring(deployment().Name))]"
+                            "name": "[concat('service-',uniquestring(resourceGroup().id,deployment().Name))]"
                         }
                     ],
                     "spec": [
