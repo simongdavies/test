@@ -269,7 +269,7 @@
                                 }
                             ], 
                             "type":"LoadBalancer",
-                            "loadBalancerIP":"[reference('CreatingPublicIp').outputs.PublicIPAddress.value]"    
+                            "load_balancer_ip":"[reference('CreatingPublicIp').outputs.PublicIPAddress.value]"    
                         }
                     ]
                 }
