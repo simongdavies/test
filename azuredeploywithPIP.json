@@ -276,7 +276,7 @@
                 }
             },
             "dependsOn": [
-                "NginxPod"
+                "NginxPod1"
             ]
         }
     ],
