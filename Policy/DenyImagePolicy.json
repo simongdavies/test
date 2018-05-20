@@ -1,0 +1,18 @@
+{"if": {
+  "allOf": [
+    {
+      "not": {
+        "field": "Microsoft.TerraformOSS/resources/image",
+        "in": ["nginx:1.7.8"]
+      }
+    },
+    {
+      "field": "type",
+      "equals": "Microsoft.TerraformOSS/resources"
+    }
+  ]
+},
+"then": {
+		"effect": "deny"
+	}
+}

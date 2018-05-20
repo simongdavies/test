@@ -1,0 +1,228 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"resourceName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the Managed Cluster resource."
+			}
+		},
+		"dnsPrefix": {
+			"type": "string",
+			"metadata": {
+				"description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN."
+			}
+		},
+		"osDiskSizeGB": {
+			"defaultValue": 0,
+			"minValue": 0,
+			"maxValue": 1023,
+			"type": "int",
+			"metadata": {
+				"description": "Disk size (in GB) to provision for each of the agent pool nodes. This value ranges from 0 to 1023. Specifying 0 will apply the default disk size for that agentVMSize."
+			}
+		},
+		"agentCount": {
+			"defaultValue": 3,
+			"minValue": 1,
+			"maxValue": 50,
+			"type": "int",
+			"metadata": {
+				"description": "The number of nodes for the cluster."
+			}
+		},
+		"agentVMSize": {
+			"defaultValue": "Standard_D2_v2",
+			"allowedValues": [
+				"Standard_A10",
+				"Standard_A11",
+				"Standard_A2",
+				"Standard_A2_v2",
+				"Standard_A2m_v2",
+				"Standard_A3",
+				"Standard_A4",
+				"Standard_A4_v2",
+				"Standard_A4m_v2",
+				"Standard_A5",
+				"Standard_A6",
+				"Standard_A7",
+				"Standard_A8",
+				"Standard_A8_v2",
+				"Standard_A8m_v2",
+				"Standard_A9",
+				"Standard_D11",
+				"Standard_D11_v2",
+				"Standard_D12",
+				"Standard_D12_v2",
+				"Standard_D13",
+				"Standard_D13_v2",
+				"Standard_D14",
+				"Standard_D14_v2",
+				"Standard_D15_v2",
+				"Standard_D2",
+				"Standard_D2_v2",
+				"Standard_D3",
+				"Standard_D3_v2",
+				"Standard_D4",
+				"Standard_D4_v2",
+				"Standard_D5_v2",
+				"Standard_DS11",
+				"Standard_DS11_v2",
+				"Standard_DS12",
+				"Standard_DS12_v2",
+				"Standard_DS13",
+				"Standard_DS13_v2",
+				"Standard_DS14",
+				"Standard_DS14_v2",
+				"Standard_DS15_v2",
+				"Standard_DS2",
+				"Standard_DS2_v2",
+				"Standard_DS3",
+				"Standard_DS3_v2",
+				"Standard_DS4",
+				"Standard_DS4_v2",
+				"Standard_DS5_v2",
+				"Standard_F16",
+				"Standard_F16s",
+				"Standard_F2",
+				"Standard_F2s",
+				"Standard_F4",
+				"Standard_F4s",
+				"Standard_F8",
+				"Standard_F8s",
+				"Standard_G1",
+				"Standard_G2",
+				"Standard_NC6",
+				"Standard_NC12",
+				"Standard_NC24",
+				"Standard_NC24r",
+				"Standard_NV6",
+				"Standard_NV12",
+				"Standard_NV24",
+				"Standard_B1s",
+				"Standard_B1ms",
+				"Standard_B2s",
+				"Standard_B2ms",
+				"Standard_B4ms",
+				"Standard_B8ms"
+			],
+			"type": "string",
+			"metadata": {
+				"description": "The size of the Virtual Machine."
+			}
+		},
+		"linuxAdminUsername": {
+			"defaultValue": "azureuser",
+			"type": "string",
+			"metadata": {
+				"description": "User name for the Linux Virtual Machines."
+			}
+		},
+		"sshRSAPublicKey": {
+			"type": "string",
+			"metadata": {
+				"description": "Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example 'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm'"
+			}
+		},
+		"servicePrincipalClientId": {
+			"defaultValue": "n/a",
+			"type": "securestring",
+			"metadata": {
+				"description": "Client ID (used by cloudprovider)"
+			}
+		},
+		"servicePrincipalClientSecret": {
+			"defaultValue": "n/a",
+			"type": "securestring",
+			"metadata": {
+				"description": "The Service Principal Client Secret."
+			}
+		},
+		"osType": {
+			"defaultValue": "Linux",
+			"allowedValues": [
+				"Linux"
+			],
+			"type": "string",
+			"metadata": {
+				"description": "The type of operating system."
+			}
+		},
+		"kubernetesVersion": {
+			"defaultValue": "1.8.7",
+			"allowedValues": [
+				"1.8.7",
+				"1.7.12"
+			],
+			"type": "string",
+			"metadata": {
+				"description": "The version of Kubernetes."
+			}
+		},
+		"TFRPlocation": {
+			"type": "string",
+			"defaultValue": "westcentralus",
+			"metadata": {
+				"description": "The location of the TFRP."
+			}
+		}
+	},
+	"variables": {
+		"resourceName": "[parameters('resourceName')]",
+		"adminUsername": "[parameters('linuxAdminUsername')]",
+		"osDiskSizeGB": "[parameters('osDiskSizeGB')]",
+		"agentCount": "[parameters('agentCount')]",
+		"agentVMSize": "[parameters('agentVMSize')]",
+		"dnsPrefix": "[parameters('dnsPrefix')]",
+		"sshRSAPublicKey": "[parameters('sshRSAPublicKey')]",
+		"servicePrincipalClientId": "[parameters('servicePrincipalClientId')]",
+		"servicePrincipalClientSecret": "[parameters('servicePrincipalClientSecret')]",
+		"osType": "[parameters('osType')]",
+		"kubernetesVersion": "[parameters('kubernetesVersion')]"
+	},
+	"resources": [
+		{
+			"type": "Microsoft.TerraformOSS/providerregistrations",
+			"name": "[parameters('resourceName')]",
+			"apiVersion": "2018-05-01-preview",
+			"location": "[parameters('TFRPlocation')]",
+			"properties": {
+				"providertype": "kubernetes",
+				"settings": {
+					"inline_config": "apiVersion: v1\r\nclusters:\r\n- cluster:\r\n    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUV4ekNDQXErZ0F3SUJBZ0lRUEZXZ29KMkRYUXFZRDlyK3AvTGU5REFOQmdrcWhraUc5dzBCQVFzRkFEQU4KTVFzd0NRWURWUVFERXdKallUQWVGdzB4T0RBek1EZ3lNelV5TkRCYUZ3MHlNREF6TURjeU16VXlOREJhTUEweApDekFKQmdOVkJBTVRBbU5oTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUF2cGQyCnZNdERIVnNUSzFoOUlaOWpNc0VYMjNEazBUVkFBZDJHOUpUS0JkNEJCZDdqNzJlN1JNYkFTMngya1NneTFtL2IKbnQ4ckgzS003b3hheEZXaU9NbkNadUU2WWRCNUI4ZHQ3VWNpb0ZzQ1hpcFlvc2dnUENyeVpBT1dnQ2hFTmQycQpoNHdPNmY4Vy9qYTlwTFUzc3NaRi9IWDBZSFZzWE9OYWdWalN5YlVvekNRbU4xeUNKS1hJK3orWEJEcjE5MWJWCm8zRk8rTzV4MG82MmJkV21OSW80aVVkM2swZjQxbnozM0VlcUhsbnlZVVg4Zy9WVTd1YkRNbTNOVHBVN05RcEkKRm1kaFFrdjhIa1JmVTc0amhXbHdod3dLVnVPSitCWXVrQnhGZzV1dHFscnNQa3hjcFovSzBVSWJ1VWU3WnptSApsVDFDdEFOQWFUeW9tTk1EUTc3RGRSMHJDUld5Vy84cUxDcHBmSkJ3bGx5ZjlCS0swaXF4MnRHeHEvUFFxbTJnCldaTE1ReWp6Qi9hUTFwQ3ZSQ0pBaWN5b1lpRFlob2VMYmtlWlk0ZUcyd29pNy9nRkNMVEdHRGZvbGZqUmdmUGQKSUhSaEYzUStpVTRha1pEUXNjVTNDRHFQaENoT1U2eXQzRUxCeW5XeXVMRFFNcnlOdkozS0N2enYvWTN6N3hXdAo1RHpqZzkySDhFTno4cHRDQ1R0VmZZS0pxSDlKNW5MM04rN0FXNEdnVkVIVTBTTDJ6aVVKdGNhRUFITTRXeWorClJVYS82ZlN1K1lDSCtzbHFiNXp0NVVTN2dnOGF2eHpBZ05VQzBFVm5EeW5YRXd6cmR6MVBocm11MzAySFFrZ1oKcllPK2hBR1R5TWljT1ZJbHNkL1gwNlFXNnlQT1lFSXJ1RW5QaElzQ0F3RUFBYU1qTUNFd0RnWURWUjBQQVFILwpCQVFEQWdLa01BOEdBMVVkRXdFQi93UUZNQU1CQWY4d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dJQkFEd0lDdkdVCndOQ2hwNUNlYlFxVzFzNC9mMWU3Slc4QzMzUUJtN3pIRXBmdER2VmppRS8zeXdINGRmZHZzUkhKMGY3dDRBWmYKb3FTTGQ1cXNZcllzUFJ5QTljN1I2cHJYdy95UkNpZ3hQaE9CL0JuT1E0K2Vic0JHS1Nsa2hySVZaNDVDQzJ2NgptbWVYL25YdlVCMFdiZk1jVjE1bC9EYnNpQ2t6R1BSWnJISm1vWDhRM3c2TUxjdUhtYSt0ZmFyNE9ZK3F6Y2wrCkN2eWZKWTFqeE00S3V4UmJTSUVxOUtqeDdhbUJPZnVEanl0NHZuQjFDRzZkc1MrclF3dDNxcU9OSU9HeDFMbUQKaWQzYjFoc29yL3dMdktCbGlhZ1RJOUYrTUl2ZFhpaWtCOXlTSTdMbG4vZ045Mko1UlJCSU8zZk9rdzNvRHBncwpRTW9NRlorVUNXQVVhdDRiMURpamJiWVR4dzFEaG5Pblo4UXhrZDN3WGZqUldESWZjTFAyOVlDQXRzNW8zYVkwCnJTUytUdHFDNmxjdHFzYmU5SHFXRWlYRS85S1ZLVVJ2WU9QVG9Lc0ExanRxcDZESkxEbG80QlJRNXM4cG51bVYKOE5lS1lLNm52QWFYZ0JLajFZWEo1Q3F0dmpkYlRjdURpUithZ1N1MWxqUXEyU0RRYkxVblNudXh1aTNKVVRRSApCaFFQczc0VGMzV1UwdEtHRERvUml0NWU4Q2czTmxYMWxaZ1JoTldYNU8vU0tmSHlXNWFPNytqZmVNM05SajUxCkZoVVJXRHFOYTVQK1RMRHY0ellZeHhiZXdWcmRGSnVIRy9uSSs4YzRxK0ovTS9RQmRsaE1pY0hXcWFrRTZVQ3MKSWFreW1IcWxzbkg1NGx3NU9BSXk0cDlpR2FmZXZnVTh0ZjFqCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K\r\n    server: https://myaksclust-wudkuberesourceg-d05f4e-b3a040bb.hcp.eastus.azmk8s.io:443\r\n  name: myAKSCluster\r\ncontexts:\r\n- context:\r\n    cluster: myAKSCluster\r\n    user: clusterAdmin_wudkubeResourceGroup_myAKSCluster\r\n  name: myAKSCluster\r\ncurrent-context: myAKSCluster\r\nkind: Config\r\npreferences: {}\r\nusers:\r\n- name: clusterAdmin_wudkubeResourceGroup_myAKSCluster\r\n  user:\r\n    client-certificate-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUU5akNDQXQ2Z0F3SUJBZ0lRSThyUnBTRW8zQ2dOWmNTUytxUHZTVEFOQmdrcWhraUc5dzBCQVFzRkFEQU4KTVFzd0NRWURWUVFERXdKallUQWVGdzB4T0RBek1EZ3lNelV5TkRGYUZ3MHlNREF6TURjeU16VXlOREZhTUNveApGekFWQmdOVkJBb1REbk41YzNSbGJUcHRZWE4wWlhKek1ROHdEUVlEVlFRREV3WmpiR2xsYm5Rd2dnSWlNQTBHCkNTcUdTSWIzRFFFQkFRVUFBNElDRHdBd2dnSUtBb0lDQVFEYTBwbTE3VnIyejg0VXU5OFF4d2hFdGNMTURLaHoKZFY4OUp0RENKU1o3THQ5NjdwOE9HWlEwUnVEWFBUSEhFajNuWVVlWG1NS2ZXYXFpVWJNM0Q2bXM3Y2J1c0d4Swo4SWpQV0NGdGIxVStqbDR1V1NPQ3BjKzNuU0d4RU1EK0c1SllpZ1BmM1pBaXFGdlVWcXdFc1RRWFFxUHFhRE9jCkRzV0FOdW0wRHVraHErdHhpYk1kNXN2YWRoWkIwUStxS2VhT1pObXRZR1RsSTZtb3BEWUdOUmhUb01VMHVjVUMKS2ZEN1puRUtTdGh5ZUFkREY2ZWFaQmd6d0svTGU1bHRPVENhWWFVbkdqMVZzeXNNWjJ6VmdOL3pEb2xORUJqTAo0emtaazJ6bkM0d2R4Q3FuNjFaSXp1enU0VDExR0R3YW9sU0ZBN2FqSVoxTHAwN09iZFEvTEJJT1JKZ282eTFKCjRVeEludzl0WnEwU0xMMlZTZVVDaExHZkpycW5RUFZFR241d3pFWlVub0VYOHdwaDlkMHFpU3Vha3JGSUVzd3gKaFFwNkVRSFV3UFBWUkpYY3VKaXN0L3F6Vk1LNk5oc0F1QTZEdnZ5RzdzTE4valBFZkVxVzIvSklBQXpqYm50QQpWZENWSndkdkdjL3BOQU9kOTk0UDNHUFdkRGFGVlRodnpraURrWXpFOS9BUCtxSXZIdVJyYVV1b011Ky8xYzVHCnNvNFRjTzJZalM4NFZWeU9nMHpreFFCNXpZZVlOcDlqL1VVQ0l2UVBLaHhoMDYxUjhObjVHdFVoKzZoVkh0V1cKb09sMERZZ3hLMDRreTNUTElQNTlXSFo2ZENVdnlWMXoxYUt3MXNGajk5MEpUclBoaTVBTWFqTlRTT1hBdzhBRgoyNitFSEZlazd1WnIzd0lEQVFBQm96VXdNekFPQmdOVkhROEJBZjhFQkFNQ0JhQXdFd1lEVlIwbEJBd3dDZ1lJCkt3WUJCUVVIQXdJd0RBWURWUjBUQVFIL0JBSXdBREFOQmdrcWhraUc5dzBCQVFzRkFBT0NBZ0VBb3FhMnJxSk8KbnhRZlIxWWhmY2tEdDdtUkFjN05LNk0rU1NSRExRdWlxNHZSSEV4c05HcmV2Nm9BNE1zRjVMSUpKRjUxYkY5TwprQ3JOV05YR3V2SzN2ZkwzMnNjajV2dEdPVkpKc1kwbGYweUdTL0dlbXhQMENvMnEvcU9jRTJpd0ZNYnZXMzZ0CndzTDRiSG02cjB0QmV1S3VtaHVnQTMrZnNQR2Fod01STEFkZHVhK0FNWnowNW9qYnpEZnUzS0hLNGJtRTlYVlIKd254Sk5ySWs3SjMrUkxxa2JBSHVESndqWjE4Nmk3LzZlOTRVR1A4eHBFWHpFMWFBZzZ3WDFuTGhrM0xwUHMwZgpPR3dIcXNtdlhiQ2R1WDVjL2d5bjdnTzVwNGxDV1BNRjZTektEMzgvSWRxcC9JU0lyUCtLTWE5ZW44UVhCMGFQCkVycGJaNlRSNmVVMWlNMUpPUnkzNWJmRWFERkthcFpqcWk3RWN0QWJuSWpVU3VOWXIza2FJY2Zrb25qNnJWNGcKSDZubHh6RTA4TzlwcDVnbmpjY2Z2YUIra1dweHlwZFBLT1NubWVscVlkY2xtVVBNMWZLN3NlOHFKSlh6MUJtUwpqTUdZVHZITFIwQ29PUStmRTRxbXd4V3pib0VCSStxSnlVanp1dGNNTEdiWFc2VHV6TndaUmlpT29ZMW8yUGxFClN0N1hIUHdoUHBROFRHaXg1NTNtT3o3Mk83bFpyTStoNWx4Sm0xSHVSUFFrQ1JIY1B6Y0x4WExxVk42emNvRkQKTjgreUlwYWdpSkIweDFYSVE1dlk3bXVjNzcwcEp3dWg1OWhKZDZOamRFYy9LV1FBODArTElEaVFoaDZXcGZmTwp3c082Nk1iL0VNZDlIY1EyT2w3N1c0NnB6UUpDUDltb3doaz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=\r\n    client-key-data: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlKSndJQkFBS0NBZ0VBMnRLWnRlMWE5cy9PRkx2ZkVNY0lSTFhDekF5b2MzVmZQU2JRd2lVbWV5N2ZldTZmCkRobVVORWJnMXoweHh4STk1MkZIbDVqQ24xbXFvbEd6TncrcHJPM0c3ckJzU3ZDSXoxZ2hiVzlWUG81ZUxsa2oKZ3FYUHQ1MGhzUkRBL2h1U1dJb0QzOTJRSXFoYjFGYXNCTEUwRjBLajZtZ3puQTdGZ0RicHRBN3BJYXZyY1ltegpIZWJMMm5ZV1FkRVBxaW5tam1UWnJXQms1U09wcUtRMkJqVVlVNkRGTkxuRkFpbncrMlp4Q2tyWWNuZ0hReGVuCm1tUVlNOEN2eTN1WmJUa3dtbUdsSnhvOVZiTXJER2RzMVlEZjh3NkpUUkFZeStNNUdaTnM1d3VNSGNRcXArdFcKU003czd1RTlkUmc4R3FKVWhRTzJveUdkUzZkT3ptM1VQeXdTRGtTWUtPc3RTZUZNU0o4UGJXYXRFaXk5bFVubApBb1N4bnlhNnAwRDFSQnArY014R1ZKNkJGL01LWWZYZEtva3JtcEt4U0JMTU1ZVUtlaEVCMU1EejFVU1YzTGlZCnJMZjZzMVRDdWpZYkFMZ09nNzc4aHU3Q3pmNHp4SHhLbHR2eVNBQU00MjU3UUZYUWxTY0hieG5QNlRRRG5mZmUKRDl4ajFuUTJoVlU0Yjg1SWc1R014UGZ3RC9xaUx4N2thMmxMcURMdnY5WE9ScktPRTNEdG1JMHZPRlZjam9OTQo1TVVBZWMySG1EYWZZLzFGQWlMMER5b2NZZE90VWZEWitSclZJZnVvVlI3VmxxRHBkQTJJTVN0T0pNdDB5eUQrCmZWaDJlblFsTDhsZGM5V2lzTmJCWS9mZENVNno0WXVRREdvelUwamx3TVBBQmR1dmhCeFhwTzdtYTk4Q0F3RUEKQVFLQ0FnQWk2a0dlZHEzeC9ieGJNSkxxSVdmZlZzVXJPOFhSRG1SUTVKV2d0TDdNSHZHSHN2VnNFWWJGUkozeAptaEVNTzR2bkZHMlE4YzMwRVNHWjNzRml3cndISExXR05sNUJJdG9oZzJWcUNiNm5TWjRiZFJ1bWFBQ1p3cGV5Cm9nSzVTUHJ6NTZtd21iQzY1dlFvRUdCSUsySXRaL094bmtqRjJOR0lvTHB2Z1lXUFd0Z3BlSmc4NkN1VXd3elEKR2FTUE9UcFJkQ1FMZHZzQ1dNdGtYamRFakVwQ1piK3hwd2FaVHNubHd6VzhONjhMckwwejVsMVcxQ3ZNYmkxZQpvVzBjc1doZzZiMnBYSlYyekN6TlFOOXJ2YkYrSGM2b25pM21zbTNVOStJRGg2TW15THNwcWZKTmtiN2FhdFFjCmorNWZMWkdnMjdQVG1iUjRjc3l2UVhVQlUyM1p6MlZ4dVozWGJTMU1tWjg1blQzV2lvZENTbjBSdU1qbXpVb0UKQ2ZIZlNaakxETzkyYXZFUlBzMUlaZ2c3cWpXcndUYit6cUo5TnJGYy9tbFg1eFZNNnZ6K2llbWNONFlwbUpYeAo1eGxtM1hGTWVoZU5ONHBqRXRXY2dQWWk1cUJBK2FjRlliZXYwa0ZUSmFuanlKaE94TlVaQzdCMk9EaC9ocFJiCm1HR3l5Q2RYTlZoaGlHRm14K0xGbnpyclMreVhXRnhITzRGM0J6S1Rlam5TbC9sK1hsdUJaREtlU2tLSGR2SlgKb2FWajNNWFhqa2RLNkVhMjZBbTAwdG9IRGl3UTg0YWtGZmNUNGpUTVkrdzhINU9kVjZIeUN6cVJsV3VoSE9OUwpBNE5iM25uQVVxeUdSV3Y5Tmw4VWF1ajRNRDJKS2RwQi9PS21XQ0lBVVFqOGx2dU40UUtDQVFFQTVhU0ppNXJRClFjSHZoZFpObEV3WndSK2N2TnVudnJxSWdtK1NJUnB3dzNsVXBpb0swcm5nUHlSdldrL3dwNkxUOXBUZXhSbVgKdHh4aEJaY1d1aFRzak1qalZjOUtHdmNLdDdKLzJ1cU1HVTVUdzJvQ2NUMWJmWnh4bHNZNitKblFLWFNEUjZycApKL1FIZmVhUXg3MWJ0TSt5NE5SUXB0eWJpbWN6MzYyYWVQcEdCalpQOFUyK1I0Vjc2dDEwSnIzVVRmeWZtZXp2CjNLTU44OG9GZjdvSmZpY1B0My9XbXV0c05mejJwNm5kYzRpaHlBakJncXNGMFg5dCttQm9xRlZoV1o1bEUvRHMKdWk5YXoyRnJGa1h6azQ1cjRNZysva2I3aHdyTnlTbENhdnpGeFFLcnVTV0tYc1JWWm93bFNkcEpqK1lSb3ZsYgpmb04vUVg4TDRaZy9FUUtDQVFFQTgvQWtyQW1mdzdTMHU4NmdFVUtMcW5jWll1dUlCS1YwSjhNSVRCZ3h1bHpiCjl6MnNCM25hTmxJNUlWbTVuUFJHRDlDM0JCTk9KeXluclhsc1h4N2FuQmNRM1pydzhaeXdEOTMwd1VyK2VrVU0KaGp1ekdhd1FSejFHRGV0Nkp4VFAwM1l5OFBRWUtuckQvQmdrWmY5NUUzMGV3Q1JQcmpQNXlwbGh2dHM1d2o1MwpOSW1UcnFaejJBcHNzb0lrZE1TSlgrMlVJaHZpbTJyclVzRXdXV3U1amdtbjFYaUl4TzRvd1NQTHZXWS93a1VyCldiTGs0cEw5KzNUWEpUelVJZ2E5SkdNQ2d0S1pxYzBPazJkNStZV0RlQnRvQXNZR3V6TUlVNWhqMTBsaWFGVHEKTTdxSTVrOExJZDdJY1NxMEFTUVpoeXRRUW9VZnFLT1pRbEliZHREYjd3S0NBUUJMWWNTSTRDdm11Z3V2U2xhegpESHdUeWhYQVpQWmVoSXJWRGx6UW93WkxGR1AyRzZ6cjJYcEVIK2l4bzdZaXdTK0ZMUDhuZ2l3c1BwT1dxeThaCnJFNnVOQzl6OXBTajMxNVVTTEx4b0xhV2hBQzVEKzUzVDZYZHlPSDhsVnU4U1hsc2NrTzUzZCtsYnRTYXZubmUKSjBtWVErbTdKZGJIdjNrTGFLODlpSlpCaWg0OFljM0NMenY3N0ZSdUYzM09UZGdJTlpvS2hCMkV0cjJZdmtNcAoxMTdRVzNBc1V6bVdKeHVoYVVWcWFqYzRlcXhvcG44bkxvNjlZM0F0bFVJbHA4bEtDdFd4UXcvaVdqTWNDaVdGCjdUWjB4SGFqRmZpZnJadFppL0ZiVEVEeUw4R1gxeldabERva3U1d3hDbVlmSlJtcXMrSXNObUNUV2dVRzhmWnIKZW5lUkFvSUJBRkw2VEM4dE11aHFqdFFYekVFeXhybWN1OGozWDVSZEI2OEMyODZ1cURQQnBKMXNvQmtHN1NCdgpSYm0vZ0xFUU1zanNjV1QwZ0RBNU0yeUNFa2dsQWEzNDlxYTdMdHl4TlA2Z3ZNSUhsWnJYNUJQQk9RSXhrblA1Ck50eERUcEQrdGxjekxNN2o2VmlCM0NyanQzWHV1aXZUOHVMZk55K0Z4S0dUSFRuRDd0alJVTkZSUHlnNHZNMHYKZHB3ZVF2SnBiR1Z5Tm1LSDQ4U0VVVG9jTnlzanhzRzNMUjBqWERySTNKb2VhQTZzT21JR0QySDZ4WHNCRDE0Ngo5M2hXUWI2MVZoK0xnbTRuMzFkd1JsWUQ2K3poNnIrdmF1a09uWG1PT1hYZUw1QXJDVXQrSHhDcmtpZnRtVmJUCkpwSEFPZXp0YjdXWUdUd1hkcFp4MkE5RVNNMVk3SWNDZ2dFQUFrc0ZwL2JVa2JVbm1PZlRieGNwZ0tSOEJHK08KS1Jrb1dsLzVLTFMwUU1KSTlnYkJ1WmtkRW5IRlZJMTlyWjYrYkFIUERrNFdUaHF0QUtuYTEwSTZlckgwREZYMQpYU0xOWGdMK3pOeHFKZk1lakZzOWV6WVlwREM4dXBJWHlZOGFUMkJSbjFwNEVuZExsMFh3Mk5rMlpJdEt5OG9qCmgxLzlRMUV1cFI3Y0lxNnJJUlZCRTl4MnBtL1cyRmRhZGQvak9Oc3h6Nk9mV3pTc3pqVS9DeDNiU2FuUU9tMFMKdk5MZVB2MDdXcFNSRU9kMlk2Q1RPTkllZFR3V01tT09PQVBoVmdyZXp2RWR1djVpQW9aalNKTmQzdXlDSFM0Mgp3b2VuajhodnpCa2w1L1czSUh1NmpjZHVrODI4VjdmVUFwaDJZNVVDWDlYd1N0WFp6aGRQeEFBdWFnPT0KLS0tLS1FTkQgUlNBIFBSSVZBVEUgS0VZLS0tLS0K\r\n    token: 583ecacee962e11e9dad18146762a245\r\n"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.TerraformOSS/resources",
+			"name": "NginxPod",
+			"apiVersion": "2018-05-01-preview",
+			"location": "[parameters('TFRPlocation')]",
+			"properties": {
+				"providerId": "[resourceId('Microsoft.TerraformOSS/providerregistrations', parameters('resourceName'))]",
+				"resourcetype": "kubernetes_pod",
+				"settings": {
+					"metadata": [{
+						"name": "nginx",
+						"labels": {
+							"App": "nginx"
+						}
+					}],
+					"spec": [{
+						"container": {
+							"image": "nginx:1.7.8",
+							"name": "nginx",
+							"port": {
+								"container_port": 80
+							}
+						}
+					}]
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.TerraformOSS/providerregistrations', parameters('resourceName'))]"
+			]
+		}
+	]
+}
